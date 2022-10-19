@@ -43,24 +43,6 @@ local on_attach = function(client, bufnr)
 
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 
-  --buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
-  --buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
-  --buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
-  --buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
-  --buf_set_keymap('i', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
-  --buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
-  --buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
-  --buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
-  --buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
-  --buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
-  --buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
-  --buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
-  --buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
-  --buf_set_keymap('n', '<C-j>', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
-  --buf_set_keymap('n', '<S-C-j>', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
-  --buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
-  --buf_set_keymap("n", "<space>f", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-
   -- formatting
   if client.resolved_capabilities.document_formatting then
     vim.api.nvim_command [[augroup Format]]
@@ -72,7 +54,7 @@ local on_attach = function(client, bufnr)
   require'completion'.on_attach(client, bufnr)
 
   -- Set completeopt to have a better completion experience
-vim.o.completeopt = 'menuone,noselect'
+vim.o.completeopt = 'menu,menuone,noselect'
 
 end
 
@@ -81,48 +63,6 @@ local luasnip = require 'luasnip'
 
 -- nvim-cmp setup
 local cmp = require 'cmp'
---cmp.setup {
---  snippet = {
---    expand = function(args)
---      luasnip.lsp_expand(args.body)
---    end,
---  },
---  mapping = {
---    ['<C-p>'] = cmp.mapping.select_prev_item(),
---    ['<C-n>'] = cmp.mapping.select_next_item(),
---    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
---    ['<C-f>'] = cmp.mapping.scroll_docs(4),
---    ['<C-Space>'] = cmp.mapping.complete(),
---    ['<C-e>'] = cmp.mapping.close(),
---    ['<CR>'] = cmp.mapping.confirm {
---      behavior = cmp.ConfirmBehavior.Replace,
---      select = true,
---    },
---    ['<Tab>'] = function(fallback)
---      if vim.fn.pumvisible() == 1 then
---        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-n>', true, true, true), 'n')
---      elseif luasnip.expand_or_jumpable() then
---        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-expand-or-jump', true, true, true), '')
---      else
---        fallback()
---      end
---    end,
---    ['<S-Tab>'] = function(fallback)
---      if vim.fn.pumvisible() == 1 then
---        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<C-p>', true, true, true), 'n')
---      elseif luasnip.jumpable(-1) then
---        vim.fn.feedkeys(vim.api.nvim_replace_termcodes('<Plug>luasnip-jump-prev', true, true, true), '')
---      else
---        fallback()
---      end
---    end,
---  },
---  sources = {
---    { name = 'nvim_lsp' },
---    { name = 'luasnip' },
---  },
---}
-
  cmp.setup({
     snippet = {
       expand = function(args)
@@ -168,16 +108,6 @@ local cmp = require 'cmp'
       { name = 'buffer' },
     })
   })
-
-  -- Set configuration for specific filetype.
- --  cmp.setup.filetype('gitcommit', {
- --    sources = cmp.config.sources({
- --      { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
- --    }, {
- --      { name = 'buffer' },
- --    })
- --  })
-
   -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
   cmp.setup.cmdline('/', {
     mapping = cmp.mapping.preset.cmdline(),
@@ -229,7 +159,9 @@ nvim_lsp.ansiblels.setup{
   capabilities = capabilities,
 }
 
-nvim_lsp.grammarly.setup{}
+nvim_lsp.grammarly.setup{
+  capabilities = capabilities
+}
 
 nvim_lsp.bashls.setup{
   capabilities = capabilities,
@@ -287,6 +219,7 @@ nvim_lsp.pylsp.setup{
 -- }
 
 nvim_lsp.rust_analyzer.setup({
+    capabilities = capabilities,
     on_attach=on_attach,
     settings = {
         ["rust-analyzer"] = {
@@ -352,10 +285,17 @@ nvim_lsp.yamlls.setup{
   capabilities = capabilities,
   on_attach = on_attach,
   settings = {
+    http = {
+      proxy = "http://kuber:kuber123@185.235.41.80:3128"
+    },
     yaml = {
       schemas = {
-        Kubernetes = "globPattern"
-     }
+        kubernetes = "/*.yaml"
+     },
+      schemaDownload = { 
+        enable = true
+      },
+      validate = false,
     }
   },
   flags = {
@@ -372,73 +312,72 @@ nvim_lsp.tsserver.setup {
     }
 }
 
--- nvim_lsp.diagnosticls.setup {
---   on_attach = on_attach,
---   filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'markdown', 'pandoc', 'python', 'c', 'cpp', 'bash', 'sh'},
---   init_options = {
---     linters = {
---       eslint = {
---         command = 'eslint_d',
---         rootPatterns = { '.git' },
---         debounce = 100,
---         args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
---         sourceName = 'eslint_d',
---         parseJson = {
---           errorsRoot = '[0].messages',
---           line = 'line',
---           column = 'column',
---           endLine = 'endLine',
---           endColumn = 'endColumn',
---           message = '[eslint] ${message} [${ruleId}]',
---           security = 'severity'
---         },
---         securities = {
---           [2] = 'error',
---           [1] = 'warning'
---         }
---       },
---     },
---     filetypes = {
---       javascript = 'eslint',
---       javascriptreact = 'eslint',
---       typescript = 'eslint',
---       typescriptreact = 'eslint',
---     },
---     formatters = {
---       eslint_d = {
---         command = 'eslint_d',
---         args = { '--stdin', '--stdin-filename', '%filename', '--fix-to-stdout' },
---         rootPatterns = { '.git' },
---       },
---       prettier = {
---         command = 'prettier',
---         args = { '--stdin-filepath', '%filename' }
---       }
---     },
---     formatFiletypes = {
---       css = 'prettier',
---       javascript = 'eslint_d',
---       javascriptreact = 'eslint_d',
---       json = 'prettier',
---       scss = 'prettier',
---       less = 'prettier',
---       typescript = 'eslint_d',
---       typescriptreact = 'eslint_d',
---       json = 'prettier',
---       markdown = 'prettier',
---     }
---   }
--- }
+nvim_lsp.diagnosticls.setup {
+  on_attach = on_attach,
+  filetypes = { 'javascript', 'javascriptreact', 'json', 'typescript', 'typescriptreact', 'css', 'less', 'scss', 'markdown', 'pandoc', 'python', 'c', 'cpp', 'bash', 'sh'},
+  init_options = {
+    linters = {
+      eslint = {
+        command = 'eslint_d',
+        rootPatterns = { '.git' },
+        debounce = 100,
+        args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
+        sourceName = 'eslint_d',
+        parseJson = {
+          errorsRoot = '[0].messages',
+          line = 'line',
+          column = 'column',
+          endLine = 'endLine',
+          endColumn = 'endColumn',
+          message = '[eslint] ${message} [${ruleId}]',
+          security = 'severity'
+        },
+        securities = {
+          [2] = 'error',
+          [1] = 'warning'
+        }
+      },
+    },
+    filetypes = {
+      javascript = 'eslint',
+      javascriptreact = 'eslint',
+      typescript = 'eslint',
+      typescriptreact = 'eslint',
+    },
+    formatters = {
+      eslint_d = {
+        command = 'eslint_d',
+        args = { '--stdin', '--stdin-filename', '%filename', '--fix-to-stdout' },
+        rootPatterns = { '.git' },
+      },
+      prettier = {
+        command = 'prettier',
+        args = { '--stdin-filepath', '%filename' }
+      }
+    },
+    formatFiletypes = {
+      css = 'prettier',
+      javascript = 'eslint_d',
+      javascriptreact = 'eslint_d',
+      json = 'prettier',
+      scss = 'prettier',
+      less = 'prettier',
+      typescript = 'eslint_d',
+      typescriptreact = 'eslint_d',
+      json = 'prettier',
+      markdown = 'prettier',
+    }
+  }
+}
 
--- icon
--- vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
---   vim.lsp.diagnostic.on_publish_diagnostics, {
---     underline = true,
---     -- This sets the spacing and the prefix, obviously.
---     virtual_text = {
---       spacing = 4,
---       prefix = ''
---     }
---   }
--- )
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    underline = true,
+    -- This sets the spacing and the prefix, obviously.
+    virtual_text = {
+      spacing = 4,
+      prefix = ''
+    }
+  }
+)
 EOF

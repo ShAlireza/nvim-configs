@@ -4,6 +4,12 @@ endif
 
 call plug#begin()
 
+Plug 'karb94/neoscroll.nvim'
+Plug 'lewis6991/gitsigns.nvim'
+Plug 'nvim-lualine/lualine.nvim'
+Plug 'numToStr/FTerm.nvim'
+Plug 'romgrk/barbar.nvim'
+Plug 'folke/which-key.nvim'
 Plug 'akinsho/bufferline.nvim', { 'tag': 'v2.*' }
 Plug 'folke/trouble.nvim'
 Plug 'kosayoda/nvim-lightbulb'
