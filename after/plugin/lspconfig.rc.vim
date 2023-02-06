@@ -151,6 +151,11 @@ nvim_lsp.flow.setup {
   on_attach = on_attach
 }
 
+nvim_lsp.clangd.setup{
+  capabilities = capabilities,
+  on_attach = on_attach
+}
+
 nvim_lsp.ansiblels.setup{
   on_attach = on_attach,
   flags = {
