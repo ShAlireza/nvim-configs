@@ -3,7 +3,7 @@ if !exists('g:lspconfig')
 endif
 
 lua << EOF
-  vim.lsp.set_log_level("debug")
+  vim.lsp.set_log_level("error")
 EOF
 
 lua << EOF
@@ -144,7 +144,7 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 --   },
 -- }
 
-capabilities = require('cmp_nvim_lsp').update_capabilities(capabilities)
+capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
 nvim_lsp.flow.setup {
   capabilities = capabilities,

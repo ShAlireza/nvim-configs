@@ -62,10 +62,10 @@ map e<left> <C-w>h
 map e<up> <C-w>k
 map e<down> <C-w>j
 map e<right> <C-w>l
-map eh <C-w>h
-map ek <C-w>k
-map ej <C-w>j
-map el <C-w>l
+" map eh <C-w>h
+" map ek <C-w>k
+" map ej <C-w>j
+" map el <C-w>l
 " Resize window
 nmap <C-w><left> <C-w><
 nmap <C-w><right> <C-w>>

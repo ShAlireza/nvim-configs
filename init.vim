@@ -10,6 +10,8 @@ scriptencoding utf-8
 " stop loading config if it's on tiny or small
 if !1 | finish | endif
 
+
+
 set nocompatible
 set number
 syntax enable
@@ -26,7 +28,7 @@ set laststatus=2
 set scrolloff=10
 set expandtab
 "let loaded_matchparen = 1
-set shell=fish
+" set shell=fish
 set backupskip=/tmp/*,/private/tmp/*
 
 " incremental substitution (neovim)
@@ -251,8 +253,8 @@ lua << EOF
     },
     disable_netrw = true,
     hijack_netrw = true,
-    open_on_setup = false,
-    ignore_ft_on_setup = { "alpha" },
+    -- open_on_setup = false,
+    -- ignore_ft_on_setup = { "alpha" },
     hijack_cursor = true,
     hijack_unnamed_buffer_when_opening = false,
     update_cwd = true,
@@ -264,7 +266,6 @@ lua << EOF
       adaptive_size = true,
       side = "left",
       width = 25,
-      hide_root_folder = true,
     },
     git = {
       enable = false,
@@ -281,6 +282,7 @@ lua << EOF
     renderer = {
       highlight_git = false,
       highlight_opened_files = "none",
+      root_folder_label = false,
   
       indent_markers = {
         enable = false,
@@ -439,22 +441,26 @@ nnoremap <silent> <Space>bw <Cmd>BufferOrderByWindowNumber<CR>
 
 lua <<EOF
 local nvim_tree_events = require('nvim-tree.events')
-local bufferline_state = require('bufferline.state')
+-- local bufferline_state = require('bufferline.state')
+local barbar = require('barbar.api')
 
 local function get_tree_size()
   return require'nvim-tree.view'.View.width
 end
 
 nvim_tree_events.subscribe('TreeOpen', function()
-  bufferline_state.set_offset(get_tree_size())
+  -- bufferline_state.set_offset(get_tree_size())
+  barbar.set_offset(get_tree_size())
 end)
 
 nvim_tree_events.subscribe('Resize', function()
-  bufferline_state.set_offset(get_tree_size())
+  -- bufferline_state.set_offset(get_tree_size())
+  barbar.set_offset(get_tree_size())
 end)
 
 nvim_tree_events.subscribe('TreeClose', function()
-  bufferline_state.set_offset(0)
+  -- bufferline_state.set_offset(0)
+  barbar.set_offset(0)
 end)
 EOF
 
@@ -627,3 +633,8 @@ let g:fzf_history_dir = '~/.local/share/fzf-history'
 
 
 " vim: set foldmethod=marker foldlevel=0:
+
+lua <<EOF
+require("toggleterm").setup()
+EOF
+
