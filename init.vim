@@ -342,10 +342,6 @@ EOF
 
 set spell
 
-lua << EOF
-require('spellsitter').setup()
-EOF
-
 lua <<EOF
 require"fidget".setup{}
 EOF
@@ -363,6 +359,41 @@ nnoremap <leader>xd <cmd>TroubleToggle document_diagnostics<cr>
 nnoremap <leader>xq <cmd>TroubleToggle quickfix<cr>
 nnoremap <leader>xl <cmd>TroubleToggle loclist<cr>
 nnoremap <leader>gr <cmd>TroubleToggle lsp_references<cr>
+
+
+lua <<EOF
+require('telescope').setup{
+
+  defaults = {
+    -- Default configuration for telescope goes here:
+    -- config_key = value,
+    mappings = {
+      i = {
+        -- map actions.which_key to <C-h> (default: <C-/>)
+        -- actions.which_key shows the mappings for your picker,
+        -- e.g. git_{create, delete, ...}_branch for the git_branches picker
+        ["<C-h>"] = "which_key"
+      }
+    }
+  },
+  pickers = {
+    -- Default configuration for builtin pickers goes here:
+    -- picker_name = {
+    --   picker_config_key = value,
+    --   ...
+    -- }
+    -- Now the picker_config_key will be applied every time you call this
+    -- builtin picker
+  },
+  extensions = {
+    -- Your extension configuration goes here:
+    -- extension_name = {
+    --   extension_config_key = value,
+    -- }
+    -- please take a look at the readme of the extension you want to configure
+  }
+}
+EOF
 
 " Find files using Telescope command-line sugar.
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
@@ -408,6 +439,7 @@ nnoremap <silent>    <A-.> <Cmd>BufferNext<CR>
 " Re-order to previous/next
 nnoremap <silent>    <A-<> <Cmd>BufferMovePrevious<CR>
 nnoremap <silent>    <A->> <Cmd>BufferMoveNext<CR>
+
 " Goto buffer in position...
 nnoremap <silent>    <space>1> <Cmd>BufferGoto 1<CR>
 nnoremap <silent>    <space>2> <Cmd>BufferGoto 2<CR>

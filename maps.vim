@@ -75,3 +75,4 @@ nmap <space>l <C-w><
 nmap <space>h <C-w>>
 nmap <space>j <C-w>+
 nmap <space>k <C-w>-
+

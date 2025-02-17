@@ -41,17 +41,17 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
   vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
 
-  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>f', '<cmd>lua vim.lsp.buf.format()<CR>', opts)
 
   -- formatting
-  if client.resolved_capabilities.document_formatting then
+
+  if client.server_capabilities.documentFormattingProvider then
     vim.api.nvim_command [[augroup Format]]
     vim.api.nvim_command [[autocmd! * <buffer>]]
-    vim.api.nvim_command [[autocmd BufWritePre <buffer> lua vim.lsp.buf.formatting_seq_sync()]]
     vim.api.nvim_command [[augroup END]]
+    vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
   end
 
-  require'completion'.on_attach(client, bufnr)
 
   -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menu,menuone,noselect'
@@ -64,11 +64,6 @@ local luasnip = require 'luasnip'
 -- nvim-cmp setup
 local cmp = require 'cmp'
  cmp.setup({
-    snippet = {
-      expand = function(args)
-        require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
-      end,
-    },
     window = {
        completion = cmp.config.window.bordered(),
        documentation = cmp.config.window.bordered(),
@@ -151,9 +146,17 @@ nvim_lsp.flow.setup {
   on_attach = on_attach
 }
 
+
+nvim_lsp.jdtls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+    cmd = {'/home/alireza/Apps/JDTLS/bin/jdtls'}
+}
+
 nvim_lsp.clangd.setup{
   capabilities = capabilities,
   on_attach = on_attach
+  -- cmd = { "clangd", "--no-cuda-version-check" }
 }
 
 nvim_lsp.ansiblels.setup{
@@ -162,10 +165,6 @@ nvim_lsp.ansiblels.setup{
       debounce_text_changes = 150,
     },
   capabilities = capabilities,
-}
-
-nvim_lsp.grammarly.setup{
-  capabilities = capabilities
 }
 
 nvim_lsp.bashls.setup{
@@ -192,6 +191,10 @@ nvim_lsp.dockerls.setup{
     }
 }
 
+nvim_lsp.solidity_ls.setup{
+  filetypes = { "solidity", "sol" }
+}
+
 nvim_lsp.java_language_server.setup{
   capabilities = capabilities,
   on_attach = on_attach,
@@ -205,7 +208,26 @@ nvim_lsp.pylsp.setup{
   on_attach = on_attach,
   flags = {
       debounce_text_changes = 150,
+    },
+  settings = {
+    pylsp = {
+      plugins = {
+        isort = {
+          enabled = true
+        },
+        ruff = {
+          enabled = true,  -- Enable the plugin
+          formatEnabled = true,  -- Enable formatting using ruffs formatter
+          unsafeFixes = false,  -- Whether or not to offer unsafe fixes as code actions. Ignored with the "Fix All" action
+
+          -- Rules that are ignored when a pyproject.toml or ruff.toml is present:
+          lineLength = 120,  -- Line length to pass to ruff checking and formatting
+          exclude = { "__about__.py" },  -- Files to be excluded by ruff checking
+          preview = false,  -- Whether to enable the preview style linting and formatting.
+        },
+      }
     }
+  }
 }
 
 -- nvim_lsp.rls.setup {
@@ -262,6 +284,15 @@ nvim_lsp.terraformls.setup{
     }
 }
 
+nvim_lsp.opencl_ls.setup{
+  capabilities = capabilities,
+  on_attach = on_attach,
+  flags = {
+      debounce_text_changes = 150,
+    }
+}
+
+
 nvim_lsp.vimls.setup{
   capabilities = capabilities,
   on_attach = on_attach,
@@ -290,12 +321,13 @@ nvim_lsp.yamlls.setup{
   capabilities = capabilities,
   on_attach = on_attach,
   settings = {
-    http = {
-      proxy = "http://kuber:kuber123@185.235.41.80:3128"
-    },
-    yaml = {
+    yaml = { 
+      completion = true,
+      format = {
+        enable = true
+      },
       schemas = {
-        kubernetes = "/*.yaml"
+        ["https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.29.0-standalone-strict/all.json"] = "/*.yaml"
      },
       schemaDownload = { 
         enable = true
@@ -375,6 +407,15 @@ nvim_lsp.diagnosticls.setup {
   }
 }
 
+-- nvim_lsp.CopilotChat.setup{
+--   capabilities = capabilities,
+--   on_attach = on_attach,
+--   flags = {
+--       debounce_text_changes = 150,
+--     }
+-- }
+
+
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
     underline = true,
@@ -385,4 +426,5 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     }
   }
 )
+
 EOF
